@@ -1,7 +1,7 @@
 /*
- * fft_test.c
+ * xcorr_test.c
  *
- *  Created on: Nov 16, 2013
+ *  Created on: Nov 20, 2013
  *      Author: du
  */
 

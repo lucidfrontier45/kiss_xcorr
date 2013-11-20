@@ -1,5 +1,5 @@
 /*
- * fft_test.c
+ * kiss_xcorr.c
  *
  *  Created on: Nov 16, 2013
  *      Author: du
