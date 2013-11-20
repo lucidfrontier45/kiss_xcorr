@@ -1,6 +1,6 @@
 KFVER=130
 
-CC = clang
+CC = gcc
 CFLAGS += -fPIC -O2 -MMD -I./include
 #CFLAGS += -fPIC -O0 -g -pg -MMD -I./include
 
