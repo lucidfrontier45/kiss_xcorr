@@ -17,7 +17,7 @@ static int prod(const int *dims, int ndims) {
 }
 
 void rfft_xcorr(size_t n, const kiss_fft_scalar *x, const kiss_fft_scalar *y,
-		kiss_fft_scalar *z) {
+		kiss_fft_scalar *z, int mode) {
 	int freq_len = n / 2 + 1;
 	int i;
 
@@ -36,8 +36,10 @@ void rfft_xcorr(size_t n, const kiss_fft_scalar *x, const kiss_fft_scalar *y,
 
 	// Multiply in freq-domain
 	for (i = 0; i < freq_len; i++) {
-		// take conjugate of Y
-		Y[i].i = -Y[i].i;
+		if (mode == KISS_XCORR) {
+			// take conjugate of Y
+			Y[i].i = -Y[i].i;
+		}
 		C_MUL(Z[i], X[i], Y[i]);
 	}
 
@@ -66,9 +68,9 @@ size_t calc_freq_comain_len(const int *dims, int ndims) {
  * compute nD cross-correlation function with pre-allocated buffer
  */
 void rfft_xcorrnd(size_t freq_len, const kiss_fft_scalar *x,
-		const kiss_fft_scalar *y, kiss_fft_scalar *z, kiss_fftndr_cfg fft_fwd,
-		kiss_fftndr_cfg fft_bwd, kiss_fft_cpx *X, kiss_fft_cpx *Y,
-		kiss_fft_cpx *Z) {
+		const kiss_fft_scalar *y, kiss_fft_scalar *z, int mode,
+		kiss_fftndr_cfg fft_fwd, kiss_fftndr_cfg fft_bwd, kiss_fft_cpx *X,
+		kiss_fft_cpx *Y, kiss_fft_cpx *Z) {
 	int i;
 
 	// Execute FWD_FFT
@@ -77,8 +79,11 @@ void rfft_xcorrnd(size_t freq_len, const kiss_fft_scalar *x,
 
 	// Multiply in freq-domain
 	for (i = 0; i < freq_len; i++) {
-		// take conjugate of Y
-		Y[i].i = -Y[i].i;
+		if (mode == KISS_XCORR) {
+			// take conjugate of Y
+			Y[i].i = -Y[i].i;
+		}
+
 		C_MUL(Z[i], X[i], Y[i]);
 	}
 
@@ -91,7 +96,7 @@ void rfft_xcorrnd(size_t freq_len, const kiss_fft_scalar *x,
  * compute nD cross-correlation function with automatic buffer allocation
  */
 void rfft_xcorrnd2(const int *dims, int ndims, const kiss_fft_scalar *x,
-		const kiss_fft_scalar *y, kiss_fft_scalar *z) {
+		const kiss_fft_scalar *y, kiss_fft_scalar *z, int mode) {
 	int i;
 	int freq_len = calc_freq_comain_len(dims, ndims);
 
@@ -105,7 +110,7 @@ void rfft_xcorrnd2(const int *dims, int ndims, const kiss_fft_scalar *x,
 	kiss_fft_cpx *Z = calloc(freq_len, sizeof(kiss_fft_cpx));
 
 	// Execute cross-correlation calculation
-	rfft_xcorrnd(freq_len, x, y, z, fft_fwd, fft_bwd, X, Y, Z);
+	rfft_xcorrnd(freq_len, x, y, z, mode, fft_fwd, fft_bwd, X, Y, Z);
 
 	// free memory
 	free(fft_fwd);
@@ -119,13 +124,13 @@ void rfft_xcorrnd2(const int *dims, int ndims, const kiss_fft_scalar *x,
  * compute 2D cross-correlation function with pre-allocated buffer
  */
 void rfft_xcorr2d(size_t h, size_t w, const kiss_fft_scalar *x,
-		const kiss_fft_scalar *y, kiss_fft_scalar *z, kiss_fftndr_cfg fft_fwd,
-		kiss_fftndr_cfg fft_bwd, kiss_fft_cpx *X, kiss_fft_cpx *Y,
-		kiss_fft_cpx *Z) {
+		const kiss_fft_scalar *y, kiss_fft_scalar *z, int mode,
+		kiss_fftndr_cfg fft_fwd, kiss_fftndr_cfg fft_bwd, kiss_fft_cpx *X,
+		kiss_fft_cpx *Y, kiss_fft_cpx *Z) {
 	int freq_len = (h / 2 + 1) * w;
 
 	// Execute cross-correlation calculation
-	rfft_xcorrnd(freq_len, x, y, z, fft_fwd, fft_bwd, X, Y, Z);
+	rfft_xcorrnd(freq_len, x, y, z, mode, fft_fwd, fft_bwd, X, Y, Z);
 
 }
 
@@ -133,10 +138,10 @@ void rfft_xcorr2d(size_t h, size_t w, const kiss_fft_scalar *x,
  * compute 2D cross-correlation function with automatic buffer allocation
  */
 void rfft_xcorr2d2(size_t h, size_t w, const kiss_fft_scalar *x,
-		const kiss_fft_scalar *y, kiss_fft_scalar *z) {
+		const kiss_fft_scalar *y, kiss_fft_scalar *z, int mode) {
 	int ndims = 2;
 	int dims[2] = { h, w };
 
 	// Execute cross-correlation calculation
-	rfft_xcorrnd2(dims, ndims, x, y, z);
+	rfft_xcorrnd2(dims, ndims, x, y, z, mode);
 }

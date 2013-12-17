@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	read_raw_image(header_file, N * N, y);
 
 
-	rfft_xcorr2d2(N, N, x, y, z);
+	rfft_xcorr2d2(N, N, x, y, z, KISS_XCORR);
 	max_i = find_max(z, N * N);
 	printf("max : %d, %d, %f\n", max_i / N, max_i % N, z[max_i] / (N * N));
 
